@@ -17,13 +17,14 @@ import restaurant.User;
  * @author STUDY fuckin HARD
  */
 public class UserControllerGUI extends javax.swing.JPanel {
+
     private MainGUI mg;
-    
+
     //table
     private Object[] row_table, column_table;
     private DefaultTableModel model;
     UserController uc;
-    
+
     public UserControllerGUI(MainGUI mg) {
         this.mg = mg;
         initComponents();
@@ -80,7 +81,6 @@ public class UserControllerGUI extends javax.swing.JPanel {
 
             }
         ));
-        jTableDB.setToolTipText("double click to see more detail");
         jScrollPane1.setViewportView(jTableDB);
         jTableDB.getTableHeader().setReorderingAllowed(false);
 
@@ -221,11 +221,10 @@ public class UserControllerGUI extends javax.swing.JPanel {
         String name = jRealName.getText();
         String surname = jRealSurname.getText();
         String email = jEmail.getText();
-        if(uname.equals(null)|| pwd.equals(null) || roles.equals("Select") || name.equals(null) || surname.equals(null) || email.equals(null)){
+        if (uname.equals(null) || pwd.equals(null) || roles.equals("Select") || name.equals(null) || surname.equals(null) || email.equals(null)) {
             JOptionPane.showMessageDialog(null, "Fill your empty");
-        }
-        else{
-            User u  = new User();
+        } else {
+            User u = new User();
             u.setUname(uname);
             u.setPwd(pwd);
             u.setRoles(roles);
@@ -233,16 +232,15 @@ public class UserControllerGUI extends javax.swing.JPanel {
             u.setSurname(surname);
             u.setEmail(email);
             int res = uc.createAccount(u);
-            if(res > 0){
+            if (res > 0) {
                 JOptionPane.showMessageDialog(null, "Finish Sign up & Welcome " + u.getName());
                 User user = mg.getU();
                 mg.dispose();
                 MainGUI mg_new = new MainGUI(user);
                 mg_new.setVisible(true);
-                mg_new.setLocationRelativeTo(null);                    
-                
-            }
-            else{
+                mg_new.setLocationRelativeTo(null);
+
+            } else {
                 JOptionPane.showMessageDialog(null, "Can not sign up", "Error", JOptionPane.ERROR_MESSAGE);
             }
 
@@ -252,7 +250,12 @@ public class UserControllerGUI extends javax.swing.JPanel {
 
     private void jEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jEditActionPerformed
         // TODO add your handling code here:
-        JTextField username = new JTextField();
+        String tempusername = "";
+        if(jTableDB.getSelectedRow()>=0){
+            tempusername = (String) jTableDB.getValueAt(jTableDB.getSelectedRow(), 0);
+        }
+        JTextField username = new JTextField(tempusername);
+        username.setEditable(false);
         JTextField name = new JTextField();
         JTextField surname = new JTextField();
         JTextField email = new JTextField();
@@ -263,56 +266,64 @@ public class UserControllerGUI extends javax.swing.JPanel {
             "Email", email
         };
         int check = JOptionPane.showConfirmDialog(null, message, "Edit Detail of User", JOptionPane.OK_CANCEL_OPTION);
-        if(check == JOptionPane.OK_OPTION){
-                if( !username.getText().isEmpty() && !name.getText().isEmpty() && !surname.getText().isEmpty() && !email.getText().isEmpty() ){
+        if (jTableDB.getSelectedRow() >= 0) {
+            if (check == JOptionPane.OK_OPTION) {
+                if (!username.getText().isEmpty() && !name.getText().isEmpty() && !surname.getText().isEmpty() && !email.getText().isEmpty()) {
                     int res = uc.editUser(username.getText(), name.getText(), surname.getText(), email.getText());
-                    if(res > 0){
+                    if (res > 0) {
                         User user = mg.getU();
                         mg.dispose();
                         MainGUI mg_new = new MainGUI(user);
                         mg_new.setVisible(true);
                         mg_new.setLocationRelativeTo(null);
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No User found", "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-                    else{
-                        JOptionPane.showMessageDialog(null, "No User found", "ERROR", JOptionPane.ERROR_MESSAGE); 
-                    }                   
-                }
-                else{
-                   JOptionPane.showMessageDialog(null, "Fill your empty", "ERROR", JOptionPane.ERROR_MESSAGE); 
+                } else {
+                    JOptionPane.showMessageDialog(null, "Fill your empty", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Select row fist", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+
     }//GEN-LAST:event_jEditActionPerformed
 
     private void jDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jDeleteActionPerformed
         // TODO add your handling code here:
         JTextField uname = new JTextField();
         Object[] message = {
-            "Username", uname
+            "Enter Username to confirm", uname
         };
         JOptionPane.showMessageDialog(null, "This is DELTE User Function !!", "WARNING", JOptionPane.WARNING_MESSAGE);
         int check = JOptionPane.showConfirmDialog(null, message, "Delete User", JOptionPane.OK_CANCEL_OPTION);
-        if(check == JOptionPane.OK_OPTION){
- 
-                if(!uname.getText().isEmpty()){
-                    int res = uc.deleteUser(uname.getText());
-                    if(res > 0){
-                        User user = mg.getU();
-                        MainGUI mg_new = new MainGUI(user);
-                        mg_new.setVisible(true);
-                        mg_new.setLocationRelativeTo(null); 
-                        mg.dispose();
+        if (jTableDB.getSelectedRow() >= 0) {
+            String checkname = (String) jTableDB.getValueAt(jTableDB.getSelectedRow(), 0);
+            if (check == JOptionPane.OK_OPTION) {
+                if (!uname.getText().isEmpty()) {
+                    if (uname.getText().equals(checkname)) {
+                        int res = uc.deleteUser(uname.getText());
+                        if (res > 0) {
+                            User user = mg.getU();
+                            MainGUI mg_new = new MainGUI(user);
+                            mg_new.setVisible(true);
+                            mg_new.setLocationRelativeTo(null);
+                            mg.dispose();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "No User Found", "ERROR", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Wrong Username", "ERROR", JOptionPane.ERROR_MESSAGE);
                     }
-                    else{
-                        JOptionPane.showMessageDialog(null, "No User Found", "ERROR", JOptionPane.ERROR_MESSAGE); 
-                    } 
+                } else {
+                    JOptionPane.showMessageDialog(null, "Fill your empty", "ERROR", JOptionPane.ERROR_MESSAGE);
                 }
-                else{
-                    JOptionPane.showMessageDialog(null, "Fill your empty", "ERROR", JOptionPane.ERROR_MESSAGE); 
-                }
-            
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Select row fist", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_jDeleteActionPerformed
-    public void getAllUser(){
+    public void getAllUser() {
         column_table = new Object[6];
         row_table = new Object[6];
         column_table[0] = "Username";
@@ -325,9 +336,9 @@ public class UserControllerGUI extends javax.swing.JPanel {
         model = new DefaultTableModel();
         model.setColumnIdentifiers(column_table);
         jTableDB.setModel(model);
-        
+
         ArrayList<User> alluser = uc.getAllUser();
-        for(int i=0; i<alluser.size(); i++){
+        for (int i = 0; i < alluser.size(); i++) {
             row_table[0] = alluser.get(i).getUname();
             row_table[1] = alluser.get(i).getPwd();
             row_table[2] = alluser.get(i).getRoles();
@@ -335,7 +346,7 @@ public class UserControllerGUI extends javax.swing.JPanel {
             row_table[4] = alluser.get(i).getSurname();
             row_table[5] = alluser.get(i).getEmail();
             model.addRow(row_table);
-         }
+        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
