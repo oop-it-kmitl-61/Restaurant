@@ -22,7 +22,7 @@ public class Database {
  
     public Database(){
         dbuser = "root";
-        dbpassw = "apple";
+        dbpassw = "root";
         dbName = "restaurant";
         url = "jdbc:mysql://localhost:3306/restaurant";
         
